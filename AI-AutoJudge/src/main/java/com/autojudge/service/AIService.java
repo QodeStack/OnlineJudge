@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AIService {
     // Lưu ý: Nhớ đổi Key mới sau khi dự án hoàn thành để bảo mật!
-    private static final String API_KEY = "AIzaSyA2qvcGs7vKP8C1djKHn-xJn4PLEIjw9Dc"; 
+    private static final String API_KEY = ""; 
     
     // Sử dụng model gemini-2.5-flash thế hệ mới nhất từ danh sách của bạn
    // Dùng bản Lite để né tình trạng kẹt xe của Google

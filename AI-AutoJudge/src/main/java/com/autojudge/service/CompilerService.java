@@ -11,7 +11,7 @@ public class CompilerService {
             ProcessBuilder pb = null;
             
             if (language.equals("Java")) {
-                pb = new ProcessBuilder("javac", "Main.java");
+                pb = new ProcessBuilder("javac", "-encoding", "UTF-8", "Main.java");
             } else if (language.equals("C++")) {
                 // Yêu cầu máy tính phải cài sẵn MinGW (g++)
                 pb = new ProcessBuilder("g++", "main.cpp", "-o", "main.exe");

@@ -10,15 +10,20 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // Đọc file FXML
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_view.fxml"));
         Parent root = loader.load();
 
-        // Thiết lập Scene
         Scene scene = new Scene(root);
-        
-        primaryStage.setTitle("AI Auto Judge System (VNOJ/Codeforces Style)");
+
+        // Load VNOJ-style CSS
+        scene.getStylesheets().add(
+            getClass().getResource("/css/style.css").toExternalForm()
+        );
+
+        primaryStage.setTitle("AI Auto Judge System");
         primaryStage.setScene(scene);
+        primaryStage.setMinWidth(900);
+        primaryStage.setMinHeight(620);
         primaryStage.show();
     }
 
