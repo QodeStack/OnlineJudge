@@ -7,8 +7,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -29,19 +32,43 @@ public class AIService {
         this.gson = new Gson();
     }
 
-    public List<TestCase> generateTestCases(String problemText) throws Exception {
+    public List<TestCase> generateTestCases(String problemText, File imageFile) throws Exception {
         String systemPrompt = "Bạn là một hệ thống Online Judge chuyên nghiệp. " +
-                "Hãy đọc đề bài sau và tạo ra chính xác 10 testcase từ dễ đến khó (bao gồm cả các trường hợp đặc biệt - edge cases). " +
+                "Hãy đọc đề bài (có thể ở dạng văn bản hoặc hình ảnh) và tạo ra chính xác 10 testcase từ dễ đến khó (bao gồm cả các trường hợp đặc biệt - edge cases). " +
                 "CHỈ TRẢ VỀ DUY NHẤT MỘT MẢNG JSON, KHÔNG CÓ BẤT KỲ VĂN BẢN NÀO KHÁC (KHÔNG dùng markdown ```json). " +
                 "Định dạng yêu cầu: [{\"id\": 1, \"input\": \"dữ liệu đầu vào\", \"expectedOutput\": \"kết quả mong đợi\", \"explanation\": \"giải thích ngắn\"}]\n\n" +
-                "Đề bài:\n" + problemText;
+                "Văn bản bổ sung (nếu có):\n" + problemText;
 
-        JsonObject part = new JsonObject();
-        part.addProperty("text", systemPrompt);
-        
         JsonArray parts = new JsonArray();
-        parts.add(part);
-        
+
+        // 1. Thêm phần Text (Câu lệnh)
+        JsonObject textPart = new JsonObject();
+        textPart.addProperty("text", systemPrompt);
+        parts.add(textPart);
+
+        // 2. Thêm phần Ảnh (Nếu người dùng có upload)
+        if (imageFile != null && imageFile.exists()) {
+            // Đọc file ảnh và mã hóa sang dạng Base64
+            byte[] fileContent = Files.readAllBytes(imageFile.toPath());
+            String base64Encoded = Base64.getEncoder().encodeToString(fileContent);
+
+            // Xác định định dạng ảnh
+            String mimeType = "image/jpeg";
+            if (imageFile.getName().toLowerCase().endsWith(".png")) {
+                mimeType = "image/png";
+            }
+
+            // Đóng gói theo chuẩn Gemini Vision
+            JsonObject inlineData = new JsonObject();
+            inlineData.addProperty("mimeType", mimeType);
+            inlineData.addProperty("data", base64Encoded);
+
+            JsonObject imagePart = new JsonObject();
+            imagePart.add("inlineData", inlineData);
+            parts.add(imagePart);
+        }
+
+        // Đóng gói JSON gửi đi
         JsonObject content = new JsonObject();
         content.add("parts", parts);
         
@@ -62,7 +89,6 @@ public class AIService {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
-            // NẾU LỖI: Đoạn này sẽ đọc chính xác Google đang chửi gì
             if (!response.isSuccessful()) {
                 String errorDetails = response.body() != null ? response.body().string() : "Không có chi tiết lỗi";
                 throw new IOException("HTTP " + response.code() + " - Chi tiết từ Google: " + errorDetails);

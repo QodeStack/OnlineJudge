@@ -2,9 +2,11 @@
 using namespace std;
 int main()
 {
-   // freopen("SGD.inp","r",stdin);
-   // freopen("SGD.out","w",stdout);
-    int x;
-    cin>>x;
-    cout<<x*2;
+   // freopen("SCP.inp","r",stdin);
+   // freopen("SCP.out","w",stdout);
+    int n;
+    cin>>n;
+    int x=sqrt(n);
+    if (x*x==n) cout<<"YES";
+     else cout<<"NO";
 }

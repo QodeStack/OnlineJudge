@@ -11,7 +11,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class MainController {
     private AIService aiService;
     private CompilerService compilerService;
     private JudgeService judgeService;
+    private File selectedImageFile = null;
 
     @FXML
     public void initialize() {
@@ -47,30 +50,35 @@ public class MainController {
 
         btnAnalyze.setOnAction(event -> handleAnalyzeProblem());
         btnSubmit.setOnAction(event -> handleSubmitCode());
+        btnUploadImage.setOnAction(event -> handleUploadImage());
     }
 
     private void handleAnalyzeProblem() {
         String problemText = problemDescriptionArea.getText();
-        if (problemText.trim().isEmpty()) {
-            systemLogArea.appendText("[LỖI] Đề bài trống!\n");
+        
+        // Nếu text trống mà cũng CHƯA chọn ảnh thì mới báo lỗi
+        if (problemText.trim().isEmpty() && selectedImageFile == null) {
+            systemLogArea.appendText("[LỖI] Bạn phải nhập đề bài hoặc tải ảnh lên!\n");
             return;
         }
 
-        systemLogArea.appendText("\nĐang gửi dữ liệu cho AI phân tích. Vui lòng đợi...\n");
+        systemLogArea.appendText("\nĐang gửi dữ liệu (Text/Ảnh) cho AI phân tích. Vui lòng đợi...\n");
         btnAnalyze.setDisable(true);
 
         new Thread(() -> {
             try {
-                List<TestCase> generatedCases = aiService.generateTestCases(problemText);
+                // TRUYỀN THÊM selectedImageFile VÀO ĐÂY:
+                List<TestCase> generatedCases = aiService.generateTestCases(problemText, selectedImageFile);
                 
                 Platform.runLater(() -> {
                     currentTestCases = generatedCases;
-                    systemLogArea.appendText("[THÀNH CÔNG] Đã sinh xong " + currentTestCases.size() + " testcases!\n");
+                    systemLogArea.appendText("[THÀNH CÔNG] Đã sinh xong " + currentTestCases.size() + " testcases từ đề bài!\n");
                     for (TestCase tc : currentTestCases) {
                         systemLogArea.appendText(String.format("Test %d: Input [%s] -> Output [%s]\n", 
                                 tc.getId(), tc.getInput(), tc.getExpectedOutput()));
                     }
                     btnAnalyze.setDisable(false);
+                    // Có thể reset ảnh nếu muốn: selectedImageFile = null;
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
@@ -164,5 +172,21 @@ public class MainController {
                 });
             }
         }).start();
+    }
+
+    private void handleUploadImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Chọn ảnh chứa đề bài");
+        // Chỉ cho phép chọn ảnh
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Hình ảnh", "*.png", "*.jpg", "*.jpeg")
+        );
+        
+        // Mở cửa sổ chọn file
+        File file = fileChooser.showOpenDialog(btnUploadImage.getScene().getWindow());
+        if (file != null) {
+            selectedImageFile = file;
+            systemLogArea.appendText("[THÀNH CÔNG] Đã tải ảnh lên: " + file.getName() + " (Sẵn sàng phân tích)\n");
+        }
     }
 }
