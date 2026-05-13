@@ -5,6 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+
+import io.github.cdimascio.dotenv.Dotenv;
 import okhttp3.*;
 
 import java.io.File;
@@ -16,14 +18,25 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class AIService {
-    // Lưu ý: Nhớ đổi Key mới sau khi dự án hoàn thành để bảo mật!
-    private static final String API_KEY = ""; 
     
-    private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + API_KEY;
+    private static final Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+    
+    // 1. Lấy Key ra và BẮT BUỘC dùng .trim() để gọt sạch khoảng trắng/ký tự ẩn
+    // Nếu không đọc được file .env, biến này sẽ rỗng ("") để tránh lỗi NullPointerException
+    private static final String API_KEY = dotenv.get("GEMINI_API_KEY") != null ? dotenv.get("GEMINI_API_KEY").trim() : ""; 
+    
+    // 2. Chú ý: Đổi lại model thành gemini-2.5-flash (vì bản -lite có thể chưa được cấp quyền chính thức)
+    private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
+    
     private final OkHttpClient client;
     private final Gson gson;
 
     public AIService() {
+        // Cảnh báo ngay lập tức nếu Java không đọc được file .env
+        if (API_KEY.isEmpty()) {
+            System.err.println("[LỖI BẢO MẬT] Không tìm thấy API Key hoặc file .env bị rỗng! Hãy kiểm tra lại thư mục của bạn.");
+        }
+
         this.client = new OkHttpClient.Builder()
                 .readTimeout(60, TimeUnit.SECONDS)
                 .build();
