@@ -19,10 +19,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -106,6 +112,9 @@ public class MainController {
     @FXML
     private Button btnClearHistory;
 
+    @FXML 
+    private Button btnReferenceCode; // Phải có @FXML thì JavaFX mới kết nối được với file FXML
+
     // ═══════════════════════════════════════════════════════════════
     // INTERNAL STATE
     // ═══════════════════════════════════════════════════════════════
@@ -132,6 +141,7 @@ public class MainController {
     // ═══════════════════════════════════════════════════════════════
     @FXML
     public void initialize() {
+        
         // Khởi tạo services
         aiService = new AIService();
         compilerService = new CompilerService();
@@ -160,10 +170,64 @@ public class MainController {
         btnSubmit.setOnAction(e -> handleSubmitCode());
         btnUploadImage.setOnAction(e -> handleUploadImage());
         btnClearHistory.setOnAction(e -> handleClearHistory());
+        btnReferenceCode.setOnAction(e -> handleGenerateReferenceCode());
 
         // ── Monaco WebView — QUAN TRỌNG ────────────────────────────
         setupMonacoEditor();
     }
+    private void handleGenerateReferenceCode() {
+    String problemText = problemDescriptionArea.getText(); // Lấy đề bài từ TextArea bên trái
+    String selectedLang = cbLanguage.getValue(); // Lấy ngôn ngữ đang chọn (Java/C++/Python)
+
+    if (problemText.trim().isEmpty()) {
+        systemLogArea.appendText("[LỖI] Bạn chưa nhập đề bài, AI không thể sinh code.\n");
+        return;
+    }
+
+    systemLogArea.appendText("[AI] Đang bắt đầu giải bài bằng " + selectedLang + "...\n");
+
+    // Chạy trong Thread để tránh treo giao diện
+    new Thread(() -> {
+        try {
+            String aiCode = aiService.generateReferenceCode(problemText, selectedLang);
+
+            Platform.runLater(() -> {
+                // TẠO CỬA SỔ MODAL (STAGE)
+                Stage modal = new Stage();
+                modal.initModality(Modality.APPLICATION_MODAL); // Khóa cửa sổ chính cho đến khi đóng popup
+                modal.setTitle("Lời giải tham khảo - " + selectedLang);
+
+                // TextArea hiển thị code tham khảo
+                TextArea area = new TextArea(aiCode);
+                area.setEditable(false);
+                area.setWrapText(false);
+                area.getStyleClass().add("code-text-area"); // Bạn có thể thêm CSS cho nó
+                area.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
+
+                // Nút Copy Code vào Editor
+                Button btnCopy = new Button("Chép vào Editor");
+                btnCopy.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand;");
+                btnCopy.setOnAction(ev -> {
+                    // Gọi hàm setCode (hàm bạn đã dùng để đổ code vào Monaco Editor)
+                    webEngine.executeScript("setCode(" + new Gson().toJson(aiCode) + ")");
+                    modal.close();
+                    systemLogArea.appendText("[AI] ✅ Đã chép code tham khảo vào Editor.\n");
+                });
+
+                VBox container = new VBox(15, new Label("Lời giải tối ưu từ AI:"), area, btnCopy);
+                container.setPadding(new Insets(20));
+                VBox.setVgrow(area, Priority.ALWAYS);
+
+                Scene scene = new Scene(container, 800, 600);
+                modal.setScene(scene);
+                modal.show();
+            });
+
+        } catch (Exception ex) {
+            Platform.runLater(() -> systemLogArea.appendText("[LỖI AI] " + ex.getMessage() + "\n"));
+        }
+    }).start();
+}
 
     // ═══════════════════════════════════════════════════════════════
     // MONACO EDITOR SETUP

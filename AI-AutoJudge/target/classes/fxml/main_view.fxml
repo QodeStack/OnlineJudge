@@ -83,6 +83,11 @@
                         <Region HBox.hgrow="ALWAYS"/>
                         <Label text="Ngôn ngữ:" styleClass="label-muted"/>
                         <ComboBox fx:id="cbLanguage" prefWidth="110" styleClass="lang-combo"/>
+                        <Button fx:id="btnReferenceCode"
+            text="💡 Code tham khảo"
+            styleClass="btn-outline"
+            prefHeight="36"/>
+
                         <Button fx:id="btnSubmit"
                                 text="▶  Nộp bài"
                                 styleClass="btn-submit"
@@ -136,15 +141,17 @@
                                         <VBox spacing="8">
                                             <padding><Insets top="8" right="14" bottom="10" left="14"/></padding>
 
-                                            <HBox alignment="CENTER_LEFT" spacing="8">
-                                                <Label text="📜" styleClass="section-icon"/>
-                                                <Label text="Lịch sử nộp bài" styleClass="section-title"/>
-                                                <Region HBox.hgrow="ALWAYS"/>
-                                                <Button fx:id="btnClearHistory"
-                                                        text="🗑  Xóa lịch sử"
-                                                        styleClass="btn-outline"
-                                                        prefHeight="28"/>
-                                            </HBox>
+<HBox alignment="CENTER_LEFT" spacing="8">
+    <padding><Insets top="5" right="10" bottom="5" left="10"/></padding>
+    <Label text="📜" styleClass="section-icon"/>
+    <Label text="Lịch sử nộp bài" styleClass="section-title"/>
+    <Region HBox.hgrow="ALWAYS"/>
+            
+    <Button fx:id="btnClearHistory"
+            text="🗑  Xóa lịch sử"
+            styleClass="btn-outline"
+            prefHeight="28"/>
+</HBox>
 
                                             <TableView fx:id="historyTable"
                                                        VBox.vgrow="ALWAYS"

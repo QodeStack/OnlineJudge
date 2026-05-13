@@ -396,3 +396,10 @@
     -fx-background-color: white;
     -fx-padding: 0;
 }
+#btnReferenceCode {
+    -fx-text-fill: #2E7D32;
+    -fx-border-color: #2E7D32;
+}
+#btnReferenceCode:hover {
+    -fx-background-color: #E8F5E9;
+}

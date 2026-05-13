@@ -1,17 +1,12 @@
 #include <iostream>
 
-using namespace std;
-
 int main() {
-    int n, m;
-    if (!(cin >> n >> m)) return 0;
-
-    // Đáng lẽ phải kiểm tra IF (m == 0) trước, 
-    // nhưng lập trình viên quên mất và chia trực tiếp!
-    
-    int result = n / m; 
-    
-    cout << result << "\n";
-
+    int N, M;
+    std::cin >> N >> M;
+    if (M == 0) {
+        std::cout << 0 << std::endl;
+    } else {
+        std::cout << N / M << std::endl;
+    }
     return 0;
 }
