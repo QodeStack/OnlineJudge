@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Xóa margin/padding mặc định để Monaco chiếm toàn bộ không gian */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #1A2332; }
+        #container { width: 100vw; height: 100vh; }
+
+        /* Thông báo lỗi khi không có internet */
+        #error-msg {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #FF6B6B;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            text-align: center;
+            background: #1A2332;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #FF6B6B;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <div id="error-msg">
+        ⚠ Không tải được Monaco Editor<br>
+        <small>Vui lòng kiểm tra kết nối internet</small>
+    </div>
+
+    <!-- Tải loader của Monaco từ CDN -->
+<script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"
+            onerror="document.getElementById('error-msg').style.display='block'"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.30.1/min/vs/loader.min.js"
+            onerror="document.getElementById('error-msg').style.display='block'"></script>
+
+    <script>
+        // Cấu hình đường dẫn CDN cho Monaco (Bản 0.30.1)
+        require.config({
+            paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.30.1/min/vs' }
+        });
+
+        window.editorReady = false;
+
+        require(['vs/editor/editor.main'], function () {
+            window.editor = monaco.editor.create(document.getElementById('container'), {
+                value: '',                          
+                language: 'java',                   
+                theme: 'vs-dark',                   
+                fontSize: 13,
+                fontFamily: 'Consolas, "Cascadia Code", "Courier New", monospace',
+                minimap:         { enabled: false }, 
+                scrollBeyondLastLine: false,
+                automaticLayout: true,              
+                wordWrap:        'off',
+                lineNumbers:     'on',
+                roundedSelection: true,
+                cursorBlinking:  'smooth',
+                smoothScrolling: true,
+                renderLineHighlight: 'all',
+                tabSize:         4,
+                insertSpaces:    true,
+                autoClosingBrackets: 'always',      
+                autoClosingQuotes:   'always',       
+                suggestOnTriggerCharacters: true,
+                quickSuggestions: true,
+                folding: true,                      
+                formatOnPaste: true,
+            });
+
+            window.editorReady = true;
+        });
+
+        function getCode() {
+            return window.editor ? window.editor.getValue() : '';
+        }
+
+        function setCode(code) {
+            if (window.editor) {
+                window.editor.setValue(code);
+                window.editor.setPosition({ lineNumber: 1, column: 1 });
+                window.editor.focus();
+            }
+        }
+
+        function setLanguage(lang) {
+            if (window.editor) {
+                monaco.editor.setModelLanguage(window.editor.getModel(), lang);
+            }
+        }
+    </script>
+</body>
+</html>

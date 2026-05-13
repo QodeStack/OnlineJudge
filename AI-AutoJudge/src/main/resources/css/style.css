@@ -346,3 +346,53 @@
     -fx-background-color: transparent;
     -fx-padding: 2;
 }
+
+/* =========================================
+   THÊM VÀO CUỐI FILE style.css
+   (dán tiếp sau phần .scroll-bar cũ)
+   ========================================= */
+
+/* === RESULT TAB PANE === */
+.result-tab-pane {
+    -fx-background-color: white;
+}
+
+.result-tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: #F8F9FA;
+    -fx-border-color: transparent transparent #E3EAF2 transparent;
+    -fx-border-width: 0 0 1.5 0;
+}
+
+.result-tab-pane > .tab-header-area .tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-padding: 7 14 7 14;
+    -fx-cursor: hand;
+}
+
+.result-tab-pane > .tab-header-area .tab:hover {
+    -fx-background-color: #E3F2FD;
+}
+
+.result-tab-pane > .tab-header-area .tab:selected {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #1565C0 transparent;
+    -fx-border-width: 0 0 2.5 0;
+}
+
+.result-tab-pane > .tab-header-area .tab .tab-label {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: #546E7A;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.result-tab-pane > .tab-header-area .tab:selected .tab-label {
+    -fx-text-fill: #1565C0;
+    -fx-font-weight: bold;
+}
+
+.result-tab-pane > .tab-content-area {
+    -fx-background-color: white;
+    -fx-padding: 0;
+}

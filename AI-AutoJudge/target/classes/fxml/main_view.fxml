@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.web.WebView?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -10,7 +11,6 @@
             prefWidth="1200" prefHeight="750"
             styleClass="root-pane">
 
-    <!-- ===== NAVBAR ===== -->
     <top>
         <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="12">
             <padding><Insets top="13" right="20" bottom="13" left="20"/></padding>
@@ -18,20 +18,17 @@
             <Label text="AI Auto Judge" styleClass="navbar-title"/>
             <Label text="VNOJ Style" styleClass="navbar-badge"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label text="v1.0.0" styleClass="navbar-version"/>
+            <Label text="v1.1.0" styleClass="navbar-version"/>
         </HBox>
     </top>
 
-    <!-- ===== MAIN CONTENT ===== -->
     <center>
         <SplitPane dividerPositions="0.42" styleClass="main-split">
             <items>
 
-                <!-- ===== LEFT PANEL: Đề Bài ===== -->
                 <VBox styleClass="side-panel" spacing="0">
                     <padding><Insets top="0" right="0" bottom="0" left="0"/></padding>
 
-                    <!-- Panel Header -->
                     <HBox styleClass="panel-header" alignment="CENTER_LEFT" spacing="8">
                         <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
                         <Label text="📋" styleClass="panel-header-icon"/>
@@ -61,10 +58,8 @@
                         </HBox>
                     </VBox>
 
-                    <!-- Divider line -->
                     <Separator styleClass="divider-line"/>
 
-                    <!-- System Log -->
                     <VBox spacing="6">
                         <padding><Insets top="10" right="14" bottom="12" left="14"/></padding>
                         <HBox alignment="CENTER_LEFT" spacing="6">
@@ -79,10 +74,8 @@
                     </VBox>
                 </VBox>
 
-                <!-- ===== RIGHT PANEL: Code Editor + Results ===== -->
                 <VBox styleClass="side-panel" spacing="0">
 
-                    <!-- Editor Header -->
                     <HBox styleClass="editor-header" alignment="CENTER_LEFT" spacing="10">
                         <padding><Insets top="10" right="14" bottom="10" left="16"/></padding>
                         <Label text="💻" styleClass="panel-header-icon"/>
@@ -96,43 +89,86 @@
                                 prefHeight="36"/>
                     </HBox>
 
-                    <!-- Code TextArea -->
-                    <VBox VBox.vgrow="ALWAYS">
-                        <padding><Insets top="0" right="14" bottom="10" left="14"/></padding>
-                        <TextArea fx:id="codeEditorArea"
-                                  promptText="// Viết code của bạn ở đây..."
-                                  VBox.vgrow="ALWAYS"
-                                  styleClass="code-editor"/>
-                    </VBox>
+                    <SplitPane orientation="VERTICAL" dividerPositions="0.65" VBox.vgrow="ALWAYS" style="-fx-box-border: transparent; -fx-padding: 0; -fx-background-color: transparent;">
+                        <items>
+                            
+                            <VBox>
+                                <WebView fx:id="codeWebView" VBox.vgrow="ALWAYS"/>
+                            </VBox>
 
-                    <!-- Divider -->
-                    <Separator styleClass="divider-line"/>
+                            <TabPane fx:id="resultTabPane"
+                                     tabClosingPolicy="UNAVAILABLE"
+                                     styleClass="result-tab-pane">
 
-                    <!-- Results Section -->
-                    <VBox spacing="8">
-                        <padding><Insets top="10" right="14" bottom="12" left="14"/></padding>
+                                <Tab text="📈  Kết quả chấm" fx:id="tabResult">
+                                    <content>
+                                        <VBox spacing="8">
+                                            <padding><Insets top="8" right="14" bottom="10" left="14"/></padding>
 
-                        <HBox alignment="CENTER_LEFT" spacing="8">
-                            <Label text="📈" styleClass="section-icon"/>
-                            <Label text="Kết quả chấm" styleClass="section-title"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <Label fx:id="scoreLabel" text="" styleClass="score-label"/>
-                        </HBox>
+                                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                                <Label text="📈" styleClass="section-icon"/>
+                                                <Label text="Kết quả chấm" styleClass="section-title"/>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Label fx:id="scoreLabel" text="" styleClass="score-label"/>
+                                            </HBox>
 
-                        <TableView fx:id="resultTable" prefHeight="215" styleClass="result-table">
-                            <columns>
-                                <TableColumn fx:id="colId"       text="Test #"        prefWidth="58"  minWidth="55"/>
-                                <TableColumn fx:id="colStatus"   text="Trạng thái"    prefWidth="155" minWidth="140"/>
-                                <TableColumn fx:id="colTime"     text="Thời gian"     prefWidth="95"  minWidth="85"/>
-                                <TableColumn fx:id="colInput"    text="Input"         prefWidth="130" minWidth="100"/>
-                                <TableColumn fx:id="colExpected" text="Expected"      prefWidth="130" minWidth="100"/>
-                                <TableColumn fx:id="colOutput"   text="Output của bạn" prefWidth="160" minWidth="130"/>
-                            </columns>
-                            <placeholder>
-                                <Label text="Chưa có kết quả — hãy phân tích đề và nộp bài!" styleClass="table-placeholder"/>
-                            </placeholder>
-                        </TableView>
-                    </VBox>
+                                            <TableView fx:id="resultTable"
+                                                       VBox.vgrow="ALWAYS"
+                                                       styleClass="result-table">
+                                                <columns>
+                                                    <TableColumn fx:id="colId"       text="Test #"         prefWidth="58"  minWidth="55"/>
+                                                    <TableColumn fx:id="colStatus"   text="Trạng thái"     prefWidth="155" minWidth="140"/>
+                                                    <TableColumn fx:id="colTime"     text="Thời gian"      prefWidth="95"  minWidth="85"/>
+                                                    <TableColumn fx:id="colInput"    text="Input"          prefWidth="130" minWidth="100"/>
+                                                    <TableColumn fx:id="colExpected" text="Expected"       prefWidth="130" minWidth="100"/>
+                                                    <TableColumn fx:id="colOutput"   text="Output của bạn" prefWidth="160" minWidth="130"/>
+                                                </columns>
+                                                <placeholder>
+                                                    <Label text="Chưa có kết quả — hãy phân tích đề và nộp bài!" styleClass="table-placeholder"/>
+                                                </placeholder>
+                                            </TableView>
+                                        </VBox>
+                                    </content>
+                                </Tab>
+
+                                <Tab text="📜  Lịch sử nộp bài" fx:id="tabHistory">
+                                    <content>
+                                        <VBox spacing="8">
+                                            <padding><Insets top="8" right="14" bottom="10" left="14"/></padding>
+
+                                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                                <Label text="📜" styleClass="section-icon"/>
+                                                <Label text="Lịch sử nộp bài" styleClass="section-title"/>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Button fx:id="btnClearHistory"
+                                                        text="🗑  Xóa lịch sử"
+                                                        styleClass="btn-outline"
+                                                        prefHeight="28"/>
+                                            </HBox>
+
+                                            <TableView fx:id="historyTable"
+                                                       VBox.vgrow="ALWAYS"
+                                                       styleClass="result-table">
+                                                <columns>
+                                                    <TableColumn fx:id="colHisId"       text="#"           prefWidth="45"  minWidth="40"/>
+                                                    <TableColumn fx:id="colHisTime"     text="Thời gian"   prefWidth="155" minWidth="140"/>
+                                                    <TableColumn fx:id="colHisLang"     text="Ngôn ngữ"    prefWidth="90"  minWidth="80"/>
+                                                    <TableColumn fx:id="colHisScore"    text="Kết quả"     prefWidth="90"  minWidth="80"/>
+                                                    <TableColumn fx:id="colHisStatus"   text="Trạng thái"  prefWidth="155" minWidth="140"/>
+                                                    <TableColumn fx:id="colHisCode"     text="Code (xem trước)" prefWidth="200" minWidth="150"/>
+                                                </columns>
+                                                <placeholder>
+                                                    <Label text="Chưa có lịch sử nộp bài nào." styleClass="table-placeholder"/>
+                                                </placeholder>
+                                            </TableView>
+                                        </VBox>
+                                    </content>
+                                </Tab>
+
+                            </TabPane>
+                        </items>
+                    </SplitPane>
+
                 </VBox>
 
             </items>
